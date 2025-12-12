@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="gambar/logo.png" sizes="192x192">
+    <link rel="apple-touch-icon" href="gambar/logo.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Black And White</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+            font-family: 'Cormorant Garamond', serif;
+            perspective: 1000px;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        .card-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1s;
+            cursor: pointer;
+        }
+        
+        .card-container.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            backface-visibility: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: flex;
+        }
+        
+        /* Sampul Depan */
+        .card-front {
+            background: black;
+            color: white;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .card-front h1 {
+            font-size: clamp(24px, 8vw, 32px);
+            font-weight: 300;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+        }
+        
+        .card-front p {
+            font-size: clamp(14px, 4vw, 16px);
+            letter-spacing: 1px;
+            opacity: 0.8;
+            margin-top: 20px;
+        }
+        
+        .ornament-front {
+            width: clamp(100px, 30vw, 150px);
+            height: clamp(100px, 30vw, 150px);
+            border: 1px solid rgba(255,255,255,0.3);
+            position: relative;
+            margin: 20px 0;
+        }
+        
+        .ornament-front:before, .ornament-front:after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 1px solid rgba(255,255,255,0.3);
+            top: 8px;
+            left: 8px;
+        }
+        
+        .ornament-front:after {
+            top: -8px;
+            left: -8px;
+        }
+        
+        /* Isi Kartu */
+        .card-back {
+            background: white;
+            transform: rotateY(180deg);
+            flex-direction: column;
+        }
+        
+        .card-left {
+            width: 100%;
+            background: black;
+            color: white;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .card-right {
+            width: 100%;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        
+        .ornament {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="none" stroke="black" stroke-width="0.5" d="M20,50 Q50,20 80,50 T20,50" /></svg>');
+            opacity: 0.1;
+            right: -50px;
+            top: -50px;
+        }
+        
+        .greeting {
+            font-size: clamp(18px, 6vw, 24px);
+            font-weight: 300;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        
+        .message {
+            font-size: clamp(14px, 4vw, 16px);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .signature {
+            font-style: italic;
+            font-size: clamp(16px, 5vw, 18px);
+            margin-top: 30px;
+        }
+        
+        .occasion {
+            font-size: clamp(12px, 3.5vw, 14px);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+        
+        .date {
+            font-size: clamp(10px, 3vw, 12px);
+            letter-spacing: 1px;
+            opacity: 0.7;
+        }
+        
+        .divider {
+            height: 1px;
+            background: white;
+            opacity: 0.3;
+            margin: 15px 0;
+        }
+        
+        /* Music control button */
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: black;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+        
+        .music-control:hover {
+            opacity: 1;
+        }
+        
+        .music-control i {
+            font-size: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .card-back {
+                flex-direction: row;
+            }
+            
+            .card-left {
+                width: 40%;
+                padding: 40px;
+            }
+            
+            .card-right {
+                width: 60%;
+                padding: 40px;
+            }
+            
+            .card-front {
+                padding: 40px;
+            }
+            
+            .card-front h1 {
+                letter-spacing: 5px;
+            }
+            
+            .card-front p {
+                letter-spacing: 2px;
+                margin-top: 30px;
+            }
+            
+            .ornament-front {
+                margin: 30px 0;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="card-container" id="cardContainer">
+        <!-- Sampul Depan -->
+        <div class="card card-front">
+            <h1>HAPPY BIRTHDAY</h1>
+            <div class="ornament-front"></div>
+            <p>Click to open</p>
+        </div>
+        
+        <!-- Isi Kartu -->
+        <div class="card card-back">
+            <div class="ornament"></div>
+            <div class="card-left">
+                <div>
+                    <div class="occasion">Happy Birthday</div>
+                    <h1>Dear Mama</h1>
+                </div>
+                <div>
+                    <div class="divider"></div>
+                    <div class="date">13 Desember 2025</div>
+                </div>
+            </div>
+            <div class="card-right">
+                <div class="greeting">
+                    Selamat ulang tahun, Ma.
+                </div>
+                <div class="message">
+                    Tidak ada yang sempurna, tapi kamu ibu yang selalu mau memperbaiki diri. Terima kasih buat segala perjuanganmu.
+                </div>
+                <div class="signature">
+                    With love,<br>
+                    Angie
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Music control button -->
+    <div class="music-control" id="musicControl" style="display: none;">
+        <i class="fas fa-volume-up" id="musicIcon"></i>
+    </div>
+
+    <script>
+        const cardContainer = document.getElementById('cardContainer');
+        const musicControl = document.getElementById('musicControl');
+        const musicIcon = document.getElementById('musicIcon');
+        
+        // Buat elemen audio
+        const audioPlayer = new Audio();
+        
+        // Daftar lagu yang akan diputar (ganti dengan file lagu Anda)
+        // Anda bisa mengganti dengan file musik lokal atau URL online
+        const songs = [
+            'cum.mp3'
+        ];
+        
+        let currentSongIndex = 0;
+        let isPlaying = false;
+        let hasStarted = false;
+        
+        // Fungsi untuk memulai musik
+        function startMusic() {
+            if (!hasStarted) {
+                // Coba file lagu yang tersedia
+                tryNextSong(0);
+                hasStarted = true;
+                
+                // Tampilkan kontrol musik
+                musicControl.style.display = 'flex';
+                
+                // Set interval untuk cek jika lagu selesai
+                setInterval(() => {
+                    if (isPlaying && audioPlayer.ended) {
+                        playNextSong();
+                    }
+                }, 1000);
+            }
+        }
+        
+        // Fungsi untuk mencoba memutar lagu berikutnya jika yang sebelumnya gagal
+        function tryNextSong(index) {
+            if (index >= songs.length) {
+                console.log("Tidak ada file musik yang dapat diputar.");
+                return;
+            }
+            
+            currentSongIndex = index;
+            audioPlayer.src = songs[index];
+            
+            // Coba putar lagu
+            audioPlayer.play().then(() => {
+                isPlaying = true;
+                musicIcon.className = 'fas fa-volume-up';
+                console.log("Memutar musik:", songs[index]);
+            }).catch(error => {
+                console.log("Gagal memutar:", songs[index], error);
+                // Coba lagu berikutnya
+                tryNextSong(index + 1);
+            });
+        }
+        
+        // Fungsi untuk memutar lagu berikutnya
+        function playNextSong() {
+            currentSongIndex = (currentSongIndex + 1) % songs.length;
+            audioPlayer.src = songs[currentSongIndex];
+            audioPlayer.play();
+            isPlaying = true;
+            musicIcon.className = 'fas fa-volume-up';
+        }
+        
+        // Fungsi untuk mengontrol musik (play/pause)
+        function toggleMusic() {
+            if (isPlaying) {
+                audioPlayer.pause();
+                musicIcon.className = 'fas fa-volume-mute';
+            } else {
+                audioPlayer.play();
+                musicIcon.className = 'fas fa-volume-up';
+            }
+            isPlaying = !isPlaying;
+        }
+        
+        // Event listener untuk kartu
+        cardContainer.addEventListener('click', function() {
+            this.classList.toggle('flipped');
+            
+            // Jika kartu dibuka (flipped), mulai musik
+            if (this.classList.contains('flipped') && !hasStarted) {
+                startMusic();
+            }
+        });
+        
+        // Event listener untuk kontrol musik
+        musicControl.addEventListener('click', toggleMusic);
+        
+        // Prevent scrolling on mobile devices
+        document.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+        
+        // Autoplay policy handling untuk browser modern
+        document.addEventListener('click', function initialInteraction() {
+            // Preload audio untuk memenuhi kebijakan autoplay
+            audioPlayer.load();
+            document.removeEventListener('click', initialInteraction);
+        });
+    </script>
+</body>
+</html>
