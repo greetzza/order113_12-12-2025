@@ -173,34 +173,6 @@
             margin: 15px 0;
         }
         
-        /* Music control button */
-        .music-control {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            background: black;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 1000;
-            opacity: 0.7;
-            transition: opacity 0.3s;
-            display: none;
-        }
-        
-        .music-control:hover {
-            opacity: 1;
-        }
-        
-        .music-control i {
-            font-size: 20px;
-        }
-        
         @media (min-width: 768px) {
             .card-back {
                 flex-direction: row;
@@ -235,7 +207,6 @@
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="card-container" id="cardContainer">
@@ -273,86 +244,33 @@
             </div>
         </div>
     </div>
-    
-    <!-- Music control button -->
-    <div class="music-control" id="musicControl">
-        <i class="fas fa-volume-up" id="musicIcon"></i>
-    </div>
+
+    <!-- Audio element -->
+    <audio id="bgMusic" loop>
+        <source src="cum.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
 
     <script>
         const cardContainer = document.getElementById('cardContainer');
-        const musicControl = document.getElementById('musicControl');
-        const musicIcon = document.getElementById('musicIcon');
+        const bgMusic = document.getElementById('bgMusic');
+        let hasPlayed = false;
         
-        // Buat elemen audio dengan SATU file lagu
-        const audioPlayer = new Audio();
-        
-        // SATU file lagu saja - GANTI DENGAN FILE LAGU ANDA
-        // Contoh: 'music/lagu-birthday.mp3' atau 'audio/happy-birthday.mp3'
-        const songFile = 'cum.mp3'; // <-- GANTI INI dengan path file musik Anda
-        
-        let isPlaying = false;
-        let hasStarted = false;
-        
-        // Fungsi untuk memulai musik
-        function startMusic() {
-            if (!hasStarted) {
-                // Set sumber audio
-                audioPlayer.src = songFile;
-                audioPlayer.loop = true; // Putar berulang-ulang
-                audioPlayer.volume = 0.7; // Volume 70%
-                
-                // Coba putar musik
-                audioPlayer.play().then(() => {
-                    isPlaying = true;
-                    hasStarted = true;
-                    musicIcon.className = 'fas fa-volume-up';
-                    musicControl.style.display = 'flex';
-                    console.log("Musik berhasil diputar");
-                }).catch(error => {
-                    console.log("Gagal memutar musik:", error);
-                    // Tampilkan pesan error jika perlu
-                    alert("Tidak dapat memutar musik. Pastikan file musik ada di lokasi yang benar.");
-                });
-            }
-        }
-        
-        // Fungsi untuk mengontrol musik (play/pause)
-        function toggleMusic() {
-            if (isPlaying) {
-                audioPlayer.pause();
-                musicIcon.className = 'fas fa-volume-mute';
-            } else {
-                audioPlayer.play();
-                musicIcon.className = 'fas fa-volume-up';
-            }
-            isPlaying = !isPlaying;
-        }
-        
-        // Event listener untuk kartu
         cardContainer.addEventListener('click', function() {
             this.classList.toggle('flipped');
             
-            // Jika kartu dibuka (flipped) dan musik belum dimulai, mulai musik
-            if (this.classList.contains('flipped') && !hasStarted) {
-                startMusic();
+            // Play music saat kartu dibuka pertama kali
+            if (this.classList.contains('flipped') && !hasPlayed) {
+                bgMusic.volume = 0.3;
+                bgMusic.play();
+                hasPlayed = true;
             }
         });
-        
-        // Event listener untuk kontrol musik
-        musicControl.addEventListener('click', toggleMusic);
         
         // Prevent scrolling on mobile devices
         document.addEventListener('touchmove', function(e) {
             e.preventDefault();
         }, { passive: false });
-        
-        // Autoplay policy handling untuk browser modern
-        document.addEventListener('click', function initialInteraction() {
-            // Preload audio untuk memenuhi kebijakan autoplay
-            audioPlayer.load();
-            document.removeEventListener('click', initialInteraction);
-        });
     </script>
 </body>
 </html>
