@@ -190,6 +190,7 @@
             z-index: 1000;
             opacity: 0.7;
             transition: opacity 0.3s;
+            display: none;
         }
         
         .music-control:hover {
@@ -274,7 +275,7 @@
     </div>
     
     <!-- Music control button -->
-    <div class="music-control" id="musicControl" style="display: none;">
+    <div class="music-control" id="musicControl">
         <i class="fas fa-volume-up" id="musicIcon"></i>
     </div>
 
@@ -283,67 +284,37 @@
         const musicControl = document.getElementById('musicControl');
         const musicIcon = document.getElementById('musicIcon');
         
-        // Buat elemen audio
+        // Buat elemen audio dengan SATU file lagu
         const audioPlayer = new Audio();
         
-        // Daftar lagu yang akan diputar (ganti dengan file lagu Anda)
-        // Anda bisa mengganti dengan file musik lokal atau URL online
-        const songs = [
-            'cum.mp3'
-        ];
+        // SATU file lagu saja - GANTI DENGAN FILE LAGU ANDA
+        // Contoh: 'music/lagu-birthday.mp3' atau 'audio/happy-birthday.mp3'
+        const songFile = 'cum.mp3'; // <-- GANTI INI dengan path file musik Anda
         
-        let currentSongIndex = 0;
         let isPlaying = false;
         let hasStarted = false;
         
         // Fungsi untuk memulai musik
         function startMusic() {
             if (!hasStarted) {
-                // Coba file lagu yang tersedia
-                tryNextSong(0);
-                hasStarted = true;
+                // Set sumber audio
+                audioPlayer.src = songFile;
+                audioPlayer.loop = true; // Putar berulang-ulang
+                audioPlayer.volume = 0.7; // Volume 70%
                 
-                // Tampilkan kontrol musik
-                musicControl.style.display = 'flex';
-                
-                // Set interval untuk cek jika lagu selesai
-                setInterval(() => {
-                    if (isPlaying && audioPlayer.ended) {
-                        playNextSong();
-                    }
-                }, 1000);
+                // Coba putar musik
+                audioPlayer.play().then(() => {
+                    isPlaying = true;
+                    hasStarted = true;
+                    musicIcon.className = 'fas fa-volume-up';
+                    musicControl.style.display = 'flex';
+                    console.log("Musik berhasil diputar");
+                }).catch(error => {
+                    console.log("Gagal memutar musik:", error);
+                    // Tampilkan pesan error jika perlu
+                    alert("Tidak dapat memutar musik. Pastikan file musik ada di lokasi yang benar.");
+                });
             }
-        }
-        
-        // Fungsi untuk mencoba memutar lagu berikutnya jika yang sebelumnya gagal
-        function tryNextSong(index) {
-            if (index >= songs.length) {
-                console.log("Tidak ada file musik yang dapat diputar.");
-                return;
-            }
-            
-            currentSongIndex = index;
-            audioPlayer.src = songs[index];
-            
-            // Coba putar lagu
-            audioPlayer.play().then(() => {
-                isPlaying = true;
-                musicIcon.className = 'fas fa-volume-up';
-                console.log("Memutar musik:", songs[index]);
-            }).catch(error => {
-                console.log("Gagal memutar:", songs[index], error);
-                // Coba lagu berikutnya
-                tryNextSong(index + 1);
-            });
-        }
-        
-        // Fungsi untuk memutar lagu berikutnya
-        function playNextSong() {
-            currentSongIndex = (currentSongIndex + 1) % songs.length;
-            audioPlayer.src = songs[currentSongIndex];
-            audioPlayer.play();
-            isPlaying = true;
-            musicIcon.className = 'fas fa-volume-up';
         }
         
         // Fungsi untuk mengontrol musik (play/pause)
@@ -362,7 +333,7 @@
         cardContainer.addEventListener('click', function() {
             this.classList.toggle('flipped');
             
-            // Jika kartu dibuka (flipped), mulai musik
+            // Jika kartu dibuka (flipped) dan musik belum dimulai, mulai musik
             if (this.classList.contains('flipped') && !hasStarted) {
                 startMusic();
             }
